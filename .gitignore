@@ -1,0 +1,46 @@
+## Ignorar archivos generados por el sistema operativo
+.DS_Store
+Thumbs.db
+
+## Ignorar archivos de Visual Studio
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Archivos binarios generados por la compilación
+bin/
+obj/
+
+## Archivos de configuración específicos del entorno
+appsettings.Development.json
+appsettings.Production.json
+appsettings.Staging.json
+
+## Ignorar los paquetes de NuGet
+*.nupkg
+# El archivo de configuración de paquetes de NuGet también puede ser ignorado
+# .nuget/
+
+## Ignorar la carpeta de dependencias de .NET (para proyectos que usan SDK de .NET)
+project.lock.json
+project.fragment.lock.json
+
+## Ignorar archivos de migraciones (si usas Entity Framework)
+Migrations/
+
+## Archivos de base de datos locales de pruebas (si los tienes)
+*.mdf
+*.ldf
+
+## Ignorar las configuraciones de JetBrains Rider
+.idea/
+
+## Archivos de log y temporales
+*.log
+*.tmp
+*.bak
+*.swp
