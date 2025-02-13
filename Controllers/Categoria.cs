@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using wenAPIProducto.Data;
 using wenAPIProducto.Helpers;
+using wenAPIProducto.Models;
 
 namespace wenAPIProducto.Controllers
 {
@@ -19,14 +20,32 @@ namespace wenAPIProducto.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCategorias()
         {
-            var categorias = await _db.Categorias.ToListAsync();
+            var categorias = await _db.Categorias
+            .Select(i => new
+            {
+                i.IdCategoria,
+                i.Nombre,
+                i.Descripcion,
+                i.Activo
+
+            })
+            .ToListAsync();
             return Ok(categorias);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoria(int id)
         {
-            var categoria = await _db.Categorias.FindAsync(id);
+            var categoria = await _db.Categorias
+            .Where(i => i.IdCategoria == id)
+        .Select(i => new
+        {
+            i.IdCategoria,
+            i.Nombre,
+            i.Descripcion,
+            i.Activo
+        })
+        .FirstOrDefaultAsync();
             if (categoria == null)
             {
                 return ApiResponse.Errors("NotFound", "Categoria no encontrada");

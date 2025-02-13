@@ -16,10 +16,37 @@ namespace wenAPIProducto.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetInventarios()
+        public async Task<IActionResult> GetInventarios(int pageNumber = 1, int pageSize = 10)
         {
-            var inventario = await _db.Inventarios.ToListAsync();
-            return Ok(inventario);
+            var skip = (pageNumber - 1) * pageSize;
+
+            var inventario = await _db.Inventarios
+            .Include(i => i.Producto)
+            .Select(i => new
+            {
+                i.IdInventario,
+                i.Cantidad,
+                i.Ubicacion,
+                Producto = new
+                {
+                    Codigo = i.Producto != null ? i.Producto.Codigo : null,
+                    Descripcion = i.Producto != null ? i.Producto.Descripcion : null,
+                }
+            })
+            .ToListAsync();
+            var totalInventarios = await _db.Inventarios.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalInventarios / pageSize);
+
+            var result = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalItems = totalInventarios,
+                Inventarios = inventario
+            };
+
+            return Ok(result);
         }
 
         [HttpGet("{id}")]

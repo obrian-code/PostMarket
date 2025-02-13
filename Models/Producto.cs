@@ -1,4 +1,3 @@
-
 namespace wenAPIProducto.Models
 {
     public class Producto

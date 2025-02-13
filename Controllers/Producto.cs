@@ -19,10 +19,44 @@ namespace wenAPIProducto.Controllers
 
         // GET: api/producto
         [HttpGet]
-        public async Task<IActionResult> GetProductos()
+        public async Task<IActionResult> GetProductos(
+            int pageNumber = 1, int pageSize = 10
+        )
         {
-            var productos = await _db.Productos.ToListAsync();
-            return Ok(productos);
+
+            var skip = (pageNumber - 1) * pageSize;
+
+            var productos = await _db.Productos
+            .Include(i => i.Categoria)
+            .Select(i => new
+            {
+                i.IdProducto,
+                i.Codigo,
+                i.Descripcion,
+                i.Precio,
+                i.Activo,
+                Categoria = new
+                {
+                    id = i.Categoria != null ? i.Categoria.IdCategoria : 0,
+                    categoria = i.Categoria != null ? i.Categoria.Nombre : null,
+                }
+            }
+            )
+            .ToListAsync();
+
+            var totalProductos = await _db.Productos.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalProductos / pageSize);
+
+            var result = new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages,
+                TotalItems = totalProductos,
+                Productos = productos
+            };
+
+            return Ok(result);
         }
 
         // GET: api/producto/{id}
