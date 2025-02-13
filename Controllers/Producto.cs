@@ -24,10 +24,12 @@ namespace wenAPIProducto.Controllers
         )
         {
 
-            var skip = (pageNumber - 1) * pageSize;
-
-            var productos = await _db.Productos
-            .Include(i => i.Categoria)
+            var result = await Pagination.GetPaginatedData(
+                _db.Productos
+            .Include(i => i.Categoria),
+            pageNumber,
+            pageSize,
+            async query => await query
             .Select(i => new
             {
                 i.IdProducto,
@@ -42,19 +44,8 @@ namespace wenAPIProducto.Controllers
                 }
             }
             )
-            .ToListAsync();
-
-            var totalProductos = await _db.Productos.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalProductos / pageSize);
-
-            var result = new
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalPages = totalPages,
-                TotalItems = totalProductos,
-                Productos = productos
-            };
+            .ToListAsync()
+            );
 
             return Ok(result);
         }

@@ -18,10 +18,13 @@ namespace wenAPIProducto.Controllers
         [HttpGet]
         public async Task<IActionResult> GetInventarios(int pageNumber = 1, int pageSize = 10)
         {
-            var skip = (pageNumber - 1) * pageSize;
 
-            var inventario = await _db.Inventarios
-            .Include(i => i.Producto)
+            var result = await Pagination.GetPaginatedData(
+             _db.Inventarios
+            .Include(i => i.Producto),
+            pageNumber,
+            pageSize,
+            async query => await query
             .Select(i => new
             {
                 i.IdInventario,
@@ -33,18 +36,8 @@ namespace wenAPIProducto.Controllers
                     Descripcion = i.Producto != null ? i.Producto.Descripcion : null,
                 }
             })
-            .ToListAsync();
-            var totalInventarios = await _db.Inventarios.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalInventarios / pageSize);
-
-            var result = new
-            {
-                PageNumber = pageNumber,
-                PageSize = pageSize,
-                TotalPages = totalPages,
-                TotalItems = totalInventarios,
-                Inventarios = inventario
-            };
+            .ToListAsync()
+            );
 
             return Ok(result);
         }
